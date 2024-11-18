@@ -84,6 +84,7 @@ export default function App() {
         type="submit"
         variant="contained"
         sx={{ marginTop: "16px", width: "300px" }}
+        onClick={() => navigate("/main")}
       >
         로그인
       </Button>

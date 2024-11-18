@@ -1,6 +1,6 @@
 // src/pages/Main.jsx
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -151,7 +151,7 @@ const PlusBtn = styled.button`
 `;
 
 function Main() {
-  const history = useHistory();
+  const navigate = useNavigate();
   //추구 DB에서 데이터 받아올 예정
   const [userRole, setUserRole] = useState("professor");
   const [userName, setUserName] = useState("이영진");
@@ -218,7 +218,7 @@ function Main() {
         </NavLeft>
         <NavRight>
           <UserName><strong>{userName}</strong>님이 로그인중</UserName>
-          <LogoutBtn onClick={() => history.push("/")}>
+          <LogoutBtn onClick={() => navigate("/")}>
             로그아웃
           </LogoutBtn>
         </NavRight>

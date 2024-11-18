@@ -9,6 +9,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
 
 function Signup() {
+  const navigate = useNavigate();
   const [selectedStuPro, setSelectedOption] = useState("");
 
   const handleChange = (event) => {
@@ -84,6 +85,7 @@ function Signup() {
           type="submit"
           variant="contained"
           sx={{ marginTop: "16px", width: "300px" }}
+          onClick={() => navigate("/")}
         >
           회원 가입
         </Button>
