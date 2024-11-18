@@ -19,6 +19,7 @@
     "redux-pack": "^0.1.5",
     "redux-thunk": "^2.3.0",
     "selector-action": "^1.1.1",
+    "styled-components": "^6.1.13",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
