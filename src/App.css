@@ -1,38 +1,6 @@
-/* src/App.css */
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column; /* 요소를 세로로 배치 */
-  align-items: center; /* 가로 중앙 정렬 */
-  justify-content: center; /* 세로 중앙 정렬 */
-  height: 100vh; /* 화면 전체 높이 */
-  background-color: #e6eeff; /* 배경색 (선택 사항) */
-  gap: 16px; /* 요소 간 간격 */
-}
-.checkbox-container {
-  display: flex; /* 자식 요소를 가로로 배치 */
-  justify-content: center; /* 가로 방향 중앙 정렬 */
-  gap: 16px; /* 체크박스 간 간격 설정 */
-  margin-top: 16px; /* 필요 시 위쪽 여백 추가 */
-}
-
-.input-field {
-  width: 300px; /* 입력 필드 너비 설정 */
-}
-.select_field {
-  align-items: center; /* 가로 중앙 정렬 */
-  justify-content: center; /* 세로 중앙 정렬 */
-}
-
-.link-container {
-  display: flex; /* 자식 요소를 가로로 배치 */
-  justify-content: center; /* 가로 방향 중앙 정렬 */
-  gap: 16px; /* 링크 간 간격 */
-  margin-top: 16px; /* 필요 시 위쪽 여백 추가 */
 }
