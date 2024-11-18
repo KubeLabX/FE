@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Login.css";
+import "../css/Login.css";
 import TextField from "@mui/material/TextField";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
@@ -17,7 +17,11 @@ function Signup() {
   };
   return (
     <div className="form-container">
-      <Typography component="h1" variant="h5">
+      <Typography component="h1" variant="h5"
+        sx={{
+          fontSize: '2rem',
+          fontWeight: 'bold'
+        }}>
         SIGN UP
       </Typography>
 
