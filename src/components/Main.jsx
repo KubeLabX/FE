@@ -1,7 +1,7 @@
-// src/pages/Main.jsx
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
+import { ClassCreate, ClassJoin } from './Modal';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -155,14 +155,38 @@ function Main() {
   //추구 DB에서 데이터 받아올 예정
   const [userRole, setUserRole] = useState("professor");
   const [userName, setUserName] = useState("이영진");
-  const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState([
+    {
+      name: "컴퓨터과학 개론",
+      studentCount: 42,
+      createdDate: "2023-03-15",
+      teacherName: "김교수",
+      joinDate: "2023-03-18"
+    },
+    {
+      name: "웹 프로그래밍",
+      studentCount: 35,
+      createdDate: "2023-03-20",
+      teacherName: "박교수",
+      joinDate: "2023-03-22"
+    },
+  ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenProfessorModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOpenStudentModal = () => {
+    setIsModalOpen(true);
+  };
 
   const Ifprofessor = () => (
     <div>
       {classes.length === 0 ? (
         <EmptyContainer>
           <EmptyText>현재 생성된 수업이 없습니다.</EmptyText>
-          <CreateBtn>
+          <CreateBtn onClick={handleOpenProfessorModal}>
             <span>+</span>
             <span><strong>수업 생성하기</strong></span>
           </CreateBtn>
@@ -178,7 +202,7 @@ function Main() {
               </ClassCard>
             ))}
           </ClassList>
-          <PlusBtn>+</PlusBtn>
+          <PlusBtn onClick={handleOpenProfessorModal}>+</PlusBtn>
         </>
       )}
     </div>
@@ -189,7 +213,7 @@ function Main() {
       {classes.length === 0 ? (
         <EmptyContainer>
           <EmptyText>현재 참여한 수업이 없습니다.</EmptyText>
-          <CreateBtn>
+          <CreateBtn onClick={handleOpenStudentModal}>
             <span>+</span>
             <span>수업 참여하기</span>
           </CreateBtn>
@@ -205,7 +229,7 @@ function Main() {
               </ClassCard>
             ))}
           </ClassList>
-          <PlusBtn>+</PlusBtn>
+          <PlusBtn onClick={handleOpenStudentModal}>+</PlusBtn>
         </>
       )}
     </div>
@@ -224,7 +248,31 @@ function Main() {
         </NavRight>
       </Navbar>
       <WhiteBoard>
-        {userRole === "professor" ? <Ifprofessor /> : <Ifstudent />}
+        {userRole === "professor" ? (
+          <>
+            <Ifprofessor />
+            <ClassCreate
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSubmit={(projectName) => {
+                // Handle project creation
+                setIsModalOpen(false);
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Ifstudent />
+            <ClassJoin
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSubmit={(classCode) => {
+                // Handle class joining
+                setIsModalOpen(false);
+              }}
+            />
+          </>
+        )}
       </WhiteBoard>
     </Container>
   );
