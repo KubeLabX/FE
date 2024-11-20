@@ -6,6 +6,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.7",
+    "@nivo/line": "^0.88.0",
     "axios": "0.18.1",
     "enzyme": "^3.8.0",
     "moment": "^2.24.0",
