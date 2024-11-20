@@ -11,6 +11,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import styled from "styled-components";
 import Typography from "@mui/material/Typography";
 import Graph from "./PodGraph";
+import PodGraph from "./PodGraph";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -97,7 +98,7 @@ function Dashboard() {
   const handleLogout = () => {
     navigate("/login"); // 로그아웃 시 /login으로 이동
   };
-  const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
+  const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
   return (
     <div className="dash">
@@ -142,7 +143,14 @@ function Dashboard() {
               </DataButton>
             </DataButtonGroup>
           </div>
-          <Graph namespace={namespace} />
+          <PodGraph
+            namespaces={[
+              "namespace1",
+              "namespace2",
+              "namespace3",
+              "namespace4",
+            ]}
+          />
         </WhiteBoard>
       </Container>
     </div>
