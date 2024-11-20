@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import styled from 'styled-components';
 
@@ -125,6 +126,7 @@ const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
 
 const ClassJoin = ({ isOpen, onClose, onSubmit }) => {
   const [classCode, setClassCode] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -142,7 +144,12 @@ const ClassJoin = ({ isOpen, onClose, onSubmit }) => {
           onChange={(e) => setClassCode(e.target.value)}
           placeholder="수업코드를 입력하세요"
         />
-        <ModalButton type="submit">입장하기</ModalButton>
+        <ModalButton
+          type="submit"
+          onClick={() => navigate("/dash_stu")}
+        >
+          입장하기
+        </ModalButton>
       </form>
     </Modal>
   );
