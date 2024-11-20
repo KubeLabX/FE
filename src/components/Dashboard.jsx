@@ -94,9 +94,8 @@ const LogoutBtn = styled.button`
 function Dashboard() {
   const [datatype, setdatatype] = useState("cpu");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
-  const [userName, setUserName] = useState("강사");
   const handleLogout = () => {
-    navigate("/"); // 로그아웃 시 /login으로 이동
+    navigate("/login"); // 로그아웃 시 /login으로 이동
   };
   const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
@@ -107,7 +106,7 @@ function Dashboard() {
           <NavLeft></NavLeft>
           <NavRight>
             <UserName>
-              <strong>{userName}</strong>님이 로그인중
+              <strong>강사</strong>님이 로그인중
             </UserName>
             <LogoutBtn onClick={handleLogout}>로그아웃</LogoutBtn>
           </NavRight>
