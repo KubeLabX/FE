@@ -153,7 +153,7 @@ const PlusBtn = styled.button`
 function Main() {
   const navigate = useNavigate();
   //추구 DB에서 데이터 받아올 예정
-  const [userRole, setUserRole] = useState("student");
+  const [userRole, setUserRole] = useState("professor");
   const [userName, setUserName] = useState("이영진");
   const [classes, setClasses] = useState([
     {

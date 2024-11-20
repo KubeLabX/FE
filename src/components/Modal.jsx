@@ -101,6 +101,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 
 const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
   const [projectName, setProjectName] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -118,7 +119,12 @@ const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
           onChange={(e) => setProjectName(e.target.value)}
           placeholder="수업명을 입력하세요"
         />
-        <ModalButton type="submit">생성하기</ModalButton>
+        <ModalButton
+          type="submit"
+          onClick={() => navigate("/dash_pro")}
+        >
+          생성하기
+        </ModalButton>
       </form>
     </Modal>
   );
