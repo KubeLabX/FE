@@ -132,6 +132,7 @@ function Dash_Rate() {
   const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
   const studentProgress = [
+    //웹소켓 이용해서 가져오기
     { name: "홍길동", id: "1234567", progress: 50 },
     { name: "신짱구", id: "1234567", progress: 0 },
     { name: "이수만", id: "1234567", progress: 30 },
@@ -190,6 +191,74 @@ function Dash_Rate() {
                 학생 실습률
               </DataButton>
             </DataButtonGroup>
+          </div>
+
+          <div
+            style={{
+              padding: "20px",
+              backgroundColor: "#F4F7FC",
+              borderRadius: "10px",
+            }}
+          >
+            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+              학생별 실습 진행률
+            </h2>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                backgroundColor: "white",
+                borderRadius: "10px",
+                overflow: "hidden",
+              }}
+            >
+              <thead>
+                <tr style={{ backgroundColor: "#F0F2F5", textAlign: "left" }}>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      padding: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    학생이름(학번)
+                  </th>
+                  <th
+                    style={{
+                      padding: "10px",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    실습 진행률
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentProgress.map((student, index) => (
+                  <tr
+                    key={index}
+                    style={{
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}
+                  >
+                    <td style={{ padding: "10px" }}>
+                      {student.name}({student.id})
+                    </td>
+                    <td
+                      style={{
+                        padding: "10px",
+                        textAlign: "center",
+                        color: student.progress > 50 ? "green" : "black",
+                      }}
+                    >
+                      {student.progress}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           <Buttons>
