@@ -176,6 +176,7 @@ function Dash_Mem() {
           </div>
           <PodGraph
             namespaces={[
+              //namespace받아와야함.
               "namespace1",
               "namespace2",
               "namespace3",

@@ -6,7 +6,7 @@ import "../css/Dash_CPU.css";
 //import Link from "@mui/material/Link";
 import styled from "styled-components";
 import PodGraph from "./PodGraph";
-import TodoModal from './TodoModal';
+import TodoModal from "./TodoModal";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -94,7 +94,6 @@ const Buttons = styled.div`
   margin-top: 20px;
 `;
 
-
 const QuitBtn = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
@@ -142,7 +141,7 @@ const AddTodoButton = styled.button`
   gap: 8px;
   margin-left: 20px;
   &:hover {
-    background-color: #4B87FF;
+    background-color: #4b87ff;
     color: white;
   }
 `;
@@ -176,7 +175,7 @@ function Dash_Rate() {
 
   const handleAddTodo = (todo) => {
     // TODO: DB에 todo 추가 로직
-    console.log('Added todo:', todo);
+    console.log("Added todo:", todo);
   };
 
   return (
@@ -203,8 +202,9 @@ function Dash_Rate() {
             <div
               style={{
                 display: "flex",
-                alignItems: "center"
-              }}>
+                alignItems: "center",
+              }}
+            >
               <h1>클라우드 시스템</h1>
               <AddTodoButton onClick={() => setIsModalOpen(true)}>
                 + TodoList 추가하기
@@ -238,6 +238,7 @@ function Dash_Rate() {
               padding: "20px",
               backgroundColor: "#F4F7FC",
               borderRadius: "10px",
+              height: "600px", // 전체 컨테이너 높이
             }}
           >
             <h2
@@ -246,67 +247,80 @@ function Dash_Rate() {
             >
               학생별 실습 진행률
             </h2>
-            <table
-              id="progress-table"
+            <div
               style={{
-                width: "100%",
-                borderCollapse: "collapse",
+                maxHeight: "500px", // 테이블 컨테이너 최대 높이
+                overflowY: "auto", // 내부 스크롤 추가
                 backgroundColor: "white",
                 borderRadius: "10px",
-                overflow: "hidden",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", //그림자
               }}
             >
-              <thead>
-                <tr
-                  id="progress-header"
-                  style={{ backgroundColor: "#F0F2F5", textAlign: "left" }}
-                >
-                  <th
-                    style={{
-                      textAlign: "center",
-                      padding: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    학생이름(학번)
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    실습 진행률
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentProgress.map((student, index) => (
+              <table
+                id="progress-table"
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                }}
+              >
+                <thead>
                   <tr
-                    key={index}
-                    id={`student-row-${index}`}
+                    id="progress-header"
                     style={{
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
+                      backgroundColor: "#F0F2F5",
+                      position: "sticky", // 헤더 고정
+                      top: 0, // 스크롤 상단에 고정
+                      zIndex: 1, // 고정된 헤더가 항상 위로 표시
+                      textAlign: "left",
                     }}
                   >
-                    <td style={{ padding: "10px" }}>
-                      {student.name}({student.id})
-                    </td>
-                    <td
+                    <th
                       style={{
-                        padding: "10px",
                         textAlign: "center",
-                        color: student.progress > 50 ? "green" : "black",
+                        padding: "10px",
+                        fontWeight: "bold",
                       }}
                     >
-                      {student.progress}%
-                    </td>
+                      학생이름(학번)
+                    </th>
+                    <th
+                      style={{
+                        padding: "10px",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      실습 진행률
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {studentProgress.map((student, index) => (
+                    <tr
+                      key={index}
+                      id={`student-row-${index}`}
+                      style={{
+                        borderBottom: "1px solid #ddd",
+                        textAlign: "center",
+                      }}
+                    >
+                      <td style={{ padding: "10px" }}>
+                        {student.name}({student.id})
+                      </td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          textAlign: "center",
+                          color: student.progress < 31 ? "green" : "black",
+                        }}
+                      >
+                        {student.progress}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Buttons>
