@@ -247,10 +247,11 @@ function Dash_Rate() {
             >
               학생별 실습 진행률
             </h2>
+
             <div
               style={{
                 maxHeight: "500px", // 테이블 컨테이너 최대 높이
-                overflowY: "auto", // 내부 스크롤 추가
+                overflowY: "auto", // 내부 스크롤 추가 ******
                 backgroundColor: "white",
                 borderRadius: "10px",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", //그림자
@@ -294,6 +295,7 @@ function Dash_Rate() {
                     </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {studentProgress.map((student, index) => (
                     <tr
