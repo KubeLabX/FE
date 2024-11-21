@@ -3,14 +3,9 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ResponsiveLine } from "@nivo/line";
 import "../css/Dash_CPU.css";
-import TextField from "@mui/material/TextField";
-import Checkbox from "@mui/material/Checkbox";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
 //import Link from "@mui/material/Link";
 import styled from "styled-components";
-import Typography from "@mui/material/Typography";
-import Graph from "./PodGraph";
+import PodGraph from "./PodGraph";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -91,14 +86,67 @@ const LogoutBtn = styled.button`
   }
 `;
 
-function Dashboard() {
-  const [datatype, setdatatype] = useState("cpu");
+const Buttons = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const QuitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #4b87ff;
+    color: white;
+  }
+`;
+
+const ExitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #f91010;
+    color: white;
+  }
+`;
+
+function Dash_Rate() {
+  const [datatype, setdatatype] = useState("student");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
-  const [userName, setUserName] = useState("강사");
   const handleLogout = () => {
     navigate("/"); // 로그아웃 시 /login으로 이동
   };
-  const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
+  const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
+
+  const studentProgress = [
+    { name: "홍길동", id: "1234567", progress: 50 },
+    { name: "신짱구", id: "1234567", progress: 0 },
+    { name: "이수만", id: "1234567", progress: 30 },
+    { name: "유재석", id: "1234567", progress: 40 },
+    { name: "이광수", id: "1234567", progress: 50 },
+    { name: "강호동", id: "1234567", progress: 60 },
+    { name: "신동엽", id: "1234567", progress: 50 },
+    { name: "홍길동", id: "1234567", progress: 70 },
+    { name: "신짱구", id: "1234567", progress: 0 },
+    { name: "이수만", id: "1234567", progress: 30 },
+    { name: "유재석", id: "1234567", progress: 65 },
+    { name: "이광수", id: "1234567", progress: 50 },
+    { name: "강호동", id: "1234567", progress: 55 },
+    { name: "신동엽", id: "1234567", progress: 50 },
+  ];
 
   return (
     <div className="dash">
@@ -107,7 +155,7 @@ function Dashboard() {
           <NavLeft></NavLeft>
           <NavRight>
             <UserName>
-              <strong>{userName}</strong>님이 로그인중
+              <strong>강사</strong>님이 로그인중
             </UserName>
             <LogoutBtn onClick={handleLogout}>로그아웃</LogoutBtn>
           </NavRight>
@@ -124,13 +172,13 @@ function Dashboard() {
             <h1>클라우드 시스템</h1>
             <DataButtonGroup>
               <DataButton
-                onClick={() => setdatatype("cpu")}
-                active={datatype === "cpu"}
+                onClick={() => navigate("/dash_cpu")}
+                active={datatype === "cpu"} //ui가 변함
               >
                 CPU 사용량
               </DataButton>
               <DataButton
-                onClick={() => setdatatype("memory")}
+                onClick={() => navigate("/dash_mem")}
                 active={datatype === "memory"}
               >
                 메모리 사용량
@@ -143,11 +191,15 @@ function Dashboard() {
               </DataButton>
             </DataButtonGroup>
           </div>
-          <Graph namespace={namespace} />
+
+          <Buttons>
+            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
+            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+          </Buttons>
         </WhiteBoard>
       </Container>
     </div>
   );
 }
 
-export default Dashboard;
+export default Dash_Rate;
