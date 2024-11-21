@@ -89,15 +89,11 @@ const LogoutBtn = styled.button`
 
 const Buttons = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
   margin-top: 20px;
 `;
 
-const RightBtns = styled.div`  
-  display: flex;
-  gap: 20px;
-`;
 
 const QuitBtn = styled.button`
   padding: 8px 16px;
@@ -133,18 +129,21 @@ const ExitBtn = styled.button`
 const AddTodoButton = styled.button`
   left: 40px;
   bottom: 40px;
-  padding: 12px 24px;
-  background-color: #4B87FF;
-  color: white;
+  padding: 8px 16px;
+  color: black;
   border: none;
-  border-radius: 50px;
+  border-radius: 10px;
+  background-color: transparent;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
+  font-size: 16px;
   gap: 8px;
+  margin-left: 20px;
   &:hover {
-    background-color: #3B69C6;
+    background-color: #4B87FF;
+    color: white;
   }
 `;
 
@@ -201,7 +200,16 @@ function Dash_Rate() {
               justifyContent: "space-between",
             }}
           >
-            <h1>클라우드 시스템</h1>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center"
+              }}>
+              <h1>클라우드 시스템</h1>
+              <AddTodoButton onClick={() => setIsModalOpen(true)}>
+                + TodoList 추가하기
+              </AddTodoButton>
+            </div>
             <DataButtonGroup>
               <DataButton
                 onClick={() => navigate("/dash_cpu")}
@@ -302,13 +310,8 @@ function Dash_Rate() {
           </div>
 
           <Buttons>
-            <AddTodoButton onClick={() => setIsModalOpen(true)}>
-              + TodoList 추가하기
-            </AddTodoButton>
-            <RightBtns>
-              <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
-              <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
-            </RightBtns>
+            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
+            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
           </Buttons>
           <TodoModal
             isOpen={isModalOpen}
