@@ -143,8 +143,9 @@ export default function App() {
 
         <div className="link-container">
           <div>
+            아직 회원이 아니신가요?
             <Link to="#" onClick={handleSignupClick}>
-              회원가입 하러가기
+              회원가입 하기
             </Link>
           </div>
         </div>
