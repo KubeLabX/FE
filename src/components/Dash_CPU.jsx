@@ -156,7 +156,7 @@ function Dash_CPU() {
             <DataButtonGroup>
               <DataButton
                 onClick={() => setdatatype("cpu")}
-                active={datatype === "cpu"}
+                active={datatype === "cpu"} //ui가 변함
               >
                 CPU 사용량
               </DataButton>

@@ -7,13 +7,13 @@ function PodGraph({ namespaces = [], datatype }) {
 
   const [activeTab, setActiveTab] = useState("cpu"); // cpu 인지 memory인지
   const [podMetrics, setPodMetrics] = useState([]); // Pod의 CPU,MEMORY 데이터 저장
-  const [websocket, setwebsocket] = useState(null); //웹소켓 인스턴스
+  const [websocket, setwebsocket] = useState(null); //웹소켓 인스턴스 저장
 
   useEffect(() => {
     // 컴포넌트가 처음 렌더링될 때와 namespaces 값이 변경될 때 실행됨
 
     //웹소켓 초기화
-    const socket = new WebSocket("ws://your-websocket-endpoint");
+    const socket = new WebSocket("ws://your-websocket-endpoint"); //실제 서버의 웹소켓 URL로 바꿔야함
     //서버의 ws://yy-w-e에 연결. 데이터 실시간 수신할 준비 완.
     setwebsocket(socket);
 
@@ -105,7 +105,7 @@ function PodGraph({ namespaces = [], datatype }) {
         },
         ticks: {
           autoSkip: true, // 레이블 자동 생략
-          maxTicksLimit: 30, // 최대 30개의 레이블 표시
+          maxTicksLimit: 40, // 최대 40개의 레이블 표시 **********
           maxRotation: 45, // 레이블 회전
           minRotation: 45,
         },
@@ -116,6 +116,13 @@ function PodGraph({ namespaces = [], datatype }) {
           display: true,
           text: datatype === "cpu" ? "CPU Usage (%)" : "Memory Usage (%)", // Y축 제목
         },
+        min: 0, // 최소값
+        max:
+          Math.max(
+            ...podMetrics.map((metric) =>
+              activeTab === "cpu" ? metric.cpu : metric.memory
+            )
+          ) + 10, // 최대값을 데이터의 최대값 + 10%로 설정
       },
     },
   };
