@@ -6,6 +6,7 @@ import "../css/Dash_CPU.css";
 //import Link from "@mui/material/Link";
 import styled from "styled-components";
 import PodGraph from "./PodGraph";
+import TodoModal from './TodoModal';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -88,9 +89,14 @@ const LogoutBtn = styled.button`
 
 const Buttons = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 20px;
   margin-top: 20px;
+`;
+
+const RightBtns = styled.div`  
+  display: flex;
+  gap: 20px;
 `;
 
 const QuitBtn = styled.button`
@@ -123,9 +129,29 @@ const ExitBtn = styled.button`
   }
 `;
 
+// Todo 추가하는 버튼
+const AddTodoButton = styled.button`
+  left: 40px;
+  bottom: 40px;
+  padding: 12px 24px;
+  background-color: #4B87FF;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  &:hover {
+    background-color: #3B69C6;
+  }
+`;
+
 function Dash_Rate() {
   const [datatype, setdatatype] = useState("student");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleLogout = () => {
     navigate("/"); // 로그아웃 시 /login으로 이동
   };
@@ -148,6 +174,11 @@ function Dash_Rate() {
     { name: "강호동", id: "1234567", progress: 55 },
     { name: "신동엽", id: "1234567", progress: 50 },
   ];
+
+  const handleAddTodo = (todo) => {
+    // TODO: DB에 todo 추가 로직
+    console.log('Added todo:', todo);
+  };
 
   return (
     <div className="dash">
@@ -194,16 +225,21 @@ function Dash_Rate() {
           </div>
 
           <div
+            id="progress-container"
             style={{
               padding: "20px",
               backgroundColor: "#F4F7FC",
               borderRadius: "10px",
             }}
           >
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+            <h2
+              id="progress-title"
+              style={{ textAlign: "center", marginBottom: "20px" }}
+            >
               학생별 실습 진행률
             </h2>
             <table
+              id="progress-table"
               style={{
                 width: "100%",
                 borderCollapse: "collapse",
@@ -213,7 +249,10 @@ function Dash_Rate() {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: "#F0F2F5", textAlign: "left" }}>
+                <tr
+                  id="progress-header"
+                  style={{ backgroundColor: "#F0F2F5", textAlign: "left" }}
+                >
                   <th
                     style={{
                       textAlign: "center",
@@ -238,6 +277,7 @@ function Dash_Rate() {
                 {studentProgress.map((student, index) => (
                   <tr
                     key={index}
+                    id={`student-row-${index}`}
                     style={{
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
@@ -262,9 +302,19 @@ function Dash_Rate() {
           </div>
 
           <Buttons>
-            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
-            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+            <AddTodoButton onClick={() => setIsModalOpen(true)}>
+              + TodoList 추가하기
+            </AddTodoButton>
+            <RightBtns>
+              <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
+              <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+            </RightBtns>
           </Buttons>
+          <TodoModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleAddTodo}
+          />
         </WhiteBoard>
       </Container>
     </div>
