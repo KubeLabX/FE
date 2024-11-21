@@ -123,11 +123,11 @@ const ExitBtn = styled.button`
   }
 `;
 
-function Dash_CPU() {
-  const [datatype, setdatatype] = useState("cpu");
+function Dash_Rate() {
+  const [datatype, setdatatype] = useState("student");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
   const handleLogout = () => {
-    navigate("/login"); // 로그아웃 시 /login으로 이동
+    navigate("/"); // 로그아웃 시 /login으로 이동
   };
   const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
@@ -140,7 +140,7 @@ function Dash_CPU() {
             <UserName>
               <strong>강사</strong>님이 로그인중
             </UserName>
-            <LogoutBtn onClick={() => navigate("/")}>로그아웃</LogoutBtn>
+            <LogoutBtn onClick={handleLogout}>로그아웃</LogoutBtn>
           </NavRight>
         </Navbar>
 
@@ -155,13 +155,13 @@ function Dash_CPU() {
             <h1>클라우드 시스템</h1>
             <DataButtonGroup>
               <DataButton
-                onClick={() => setdatatype("cpu")}
+                onClick={() => navigate("/dash_cpu")}
                 active={datatype === "cpu"} //ui가 변함
               >
                 CPU 사용량
               </DataButton>
               <DataButton
-                onClick={() => setdatatype("memory")}
+                onClick={() => navigate("/dash_mem")}
                 active={datatype === "memory"}
               >
                 메모리 사용량
@@ -174,15 +174,7 @@ function Dash_CPU() {
               </DataButton>
             </DataButtonGroup>
           </div>
-          <PodGraph
-            namespaces={[
-              "namespace1",
-              "namespace2",
-              "namespace3",
-              "namespace4",
-            ]}
-            datatype={datatype}
-          />
+
           <Buttons>
             <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
             <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
@@ -193,4 +185,4 @@ function Dash_CPU() {
   );
 }
 
-export default Dash_CPU;
+export default Dash_Rate;

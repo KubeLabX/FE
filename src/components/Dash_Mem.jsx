@@ -140,7 +140,7 @@ function Dash_Mem() {
             <UserName>
               <strong>강사</strong>님이 로그인중
             </UserName>
-            <LogoutBtn onClick={handleLogout}>로그아웃</LogoutBtn>
+            <LogoutBtn onClick={() => navigate("/")}>로그아웃</LogoutBtn>
           </NavRight>
         </Navbar>
 
@@ -167,7 +167,7 @@ function Dash_Mem() {
                 메모리 사용량
               </DataButton>
               <DataButton
-                onClick={() => setdatatype("student")}
+                onClick={() => navigate("/dash_rate")}
                 active={datatype === "student"}
               >
                 학생 실습률

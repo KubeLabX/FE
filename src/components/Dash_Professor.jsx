@@ -136,7 +136,7 @@ function Dashboard() {
                 메모리 사용량
               </DataButton>
               <DataButton
-                onClick={() => setdatatype("student")}
+                onClick={() => navigate("/dash_rate")}
                 active={datatype === "student"}
               >
                 학생 실습률
