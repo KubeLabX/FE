@@ -78,24 +78,31 @@ const ClassCard = styled.div`
   &:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
+  
+  display: flex;
+  align-items: center;
+  gap: 40px;  
+  position: relative;  // 추가: 자식 요소의 absolute 포지셔닝을 위해
 `;
 
 const ClassName = styled.h3`
   font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 8px;
   color: #333;
+  min-width: 200px;
 `;
 
 const ClassDetail = styled.p`
   color: #BBBBBB;
   font-size: 1.25rem;
-  margin-bottom: 4px;
+  min-width: 150px;
 `;
 
 const ClassDate = styled.p`
   color: #00205F;
   font-size: 1.2rem;
+  position: absolute;  // 추가
+  right: 30px;        // 추가: 오른쪽에 붙이기
 `;
 
 const EmptyContainer = styled.div`
@@ -153,7 +160,7 @@ const PlusBtn = styled.button`
 function Main() {
   const navigate = useNavigate();
   //추구 DB에서 데이터 받아올 예정
-  const [userRole, setUserRole] = useState("professor");
+  const [userRole, setUserRole] = useState("student");
   const [userName, setUserName] = useState("이영진");
   const [classes, setClasses] = useState([
     {
@@ -197,7 +204,7 @@ function Main() {
             {classes.map((classItem, index) => (
               <ClassCard key={index}>
                 <ClassName>{classItem.name}</ClassName>
-                <ClassDetail><strong>{classItem.studentCount}명이 참여중..</strong></ClassDetail>
+                <ClassDetail><strong>참여인원: {classItem.studentCount}명</strong></ClassDetail>
                 <ClassDate>생성일: {classItem.createdDate}</ClassDate>
               </ClassCard>
             ))}
@@ -224,7 +231,7 @@ function Main() {
             {classes.map((classItem, index) => (
               <ClassCard key={index}>
                 <ClassName>{classItem.name}</ClassName>
-                <ClassDetail><strong>{classItem.teacherName}</strong></ClassDetail>
+                <ClassDetail><strong>담당교수: {classItem.teacherName}</strong></ClassDetail>
                 <ClassDate>참여일: {classItem.joinDate}</ClassDate>
               </ClassCard>
             ))}
