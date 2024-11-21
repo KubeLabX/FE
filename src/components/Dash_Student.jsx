@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
+import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
+import 'xterm/css/xterm.css';
+
 
 const Container = styled.div`
   min-height: 100vh;
@@ -75,7 +79,7 @@ const BoardContent = styled.div`
   height: 100%;
 `;
 
-const Terminal = styled.div`
+const TerminalContainer = styled.div`
   background: black;
   border-radius: 10px;
   padding: 20px;
@@ -179,17 +183,91 @@ function Dash_Student() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("이영진");
   const [todos, setTodos] = useState([
-    { id: 1, text: "lab6 디렉토리 만들기", completed: true },
-    { id: 2, text: "lab7 디렉토리 만들기", completed: true },
+    { id: 1, text: "lab6 디렉토리 만들기", completed: false },
+    { id: 2, text: "lab7 디렉토리 만들기", completed: false },
     { id: 3, text: "lab8 디렉토리 만들기", completed: false },
     { id: 4, text: "lab9 디렉토리 만들기", completed: false },
   ]);
+
+  // ref 추가
+  const terminalRef = useRef(null);
+  const terminalInstance = useRef(null);
+
 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ));
   };
+
+  useEffect(() => {
+    // 터미널 초기화
+    if (terminalRef.current) {
+      const term = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        theme: {
+          background: '#000000',
+          foreground: '#ffffff'
+        }
+      });
+
+      //임시 설정 터미널 ----------------------------------------
+      const fitAddon = new FitAddon();
+      term.loadAddon(fitAddon); // 터미널에 FitAddon 추가
+      term.open(terminalRef.current);
+      fitAddon.fit(); // 컨테이너 크기에 맞게 조절
+
+      // 초기 메시지 출력
+      term.writeln('Terminal Test Mode');
+      term.writeln('Type something to test...');
+      term.write('\r\n$ ');
+
+      // 키보드 입력 처리
+      let commandBuffer = '';
+
+      term.onData(data => {
+        // Enter key
+        if (data === '\r') {
+          term.write('\n');
+          if (commandBuffer.trim().length > 0) {
+            // 간단한 명령어 처리
+            if (commandBuffer === 'clear') {
+              term.clear();
+            } else {
+              term.writeln(`Command entered: ${commandBuffer}`);
+            }
+          }
+          commandBuffer = '';
+          term.write('$ ');
+        }
+        // Backspace
+        else if (data === '\x7f') {
+          if (commandBuffer.length > 0) {
+            commandBuffer = commandBuffer.slice(0, -1);
+            term.write('\b \b');
+          }
+        }
+        // Regular input
+        else {
+          commandBuffer += data;
+          term.write(data);
+        }
+      });
+
+      // 창 크기 변경 처리
+      const handleResize = () => fitAddon.fit();
+      window.addEventListener('resize', handleResize);
+
+      terminalInstance.current = term;
+
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        term.dispose();
+      };
+    }
+  }, []); //추후 pod 생성 및 연결 필요
 
   return (
     <Container>
@@ -210,9 +288,7 @@ function Dash_Student() {
       </NavbarContainer>
       <WhiteBoard>
         <BoardContent>
-          <Terminal>
-            $~: mkdir hello_world
-          </Terminal>
+          <TerminalContainer ref={terminalRef} />
           <TodoListContainer>
             <TodoTitle>TodoList</TodoTitle>
             {todos.map(todo => (
