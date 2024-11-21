@@ -2,57 +2,69 @@ import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 
-function PodGraph({ namespaces = [] }) {
+function PodGraph({ namespaces = [], datatype }) {
   // namespaces: 각 학생이 속한 namespace의 리스트 (부모 컴포넌트에서 전달받음)
 
-  const [podMetrics, setPodMetrics] = useState([]); // Pod의 CPU 데이터 저장
+  const [activeTab, setActiveTab] = useState("cpu"); // cpu 인지 memory인지
+  const [podMetrics, setPodMetrics] = useState([]); // Pod의 CPU,MEMORY 데이터 저장
+  const [websocket, setwebsocket] = useState(null); //웹소켓 인스턴스
 
   useEffect(() => {
     // 컴포넌트가 처음 렌더링될 때와 namespaces 값이 변경될 때 실행됨
 
-    const fetchMetrics = async () => {
-      const allMetrics = []; // 모든 namespace의 데이터를 저장할 배열
+    //웹소켓 초기화
+    const socket = new WebSocket("ws://your-websocket-endpoint");
+    //서버의 ws://yy-w-e에 연결. 데이터 실시간 수신할 준비 완.
+    setwebsocket(socket);
 
-      for (const namespace of namespaces) {
-        try {
-          // API 호출
-          const response = await fetch(`/api/pods-metrics/${namespace}/`);
-          const data = await response.json();
+    //웹소켓 메시지 수신. 서버가 웹소켓 통해 데이터 전송하면 onmessage이벤트가 호출됨
 
-          // 전체 CPU 사용량 계산
-          const totalCpuUsage = data.reduce(
-            (total, pod) =>
-              total + parseInt(pod.usage.cpu.replace("m", ""), 10),
-            0
-          );
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data); //서버가 전달한 데이터(event.data)가 JSON형태로 변환
 
-          // 각 Pod의 CPU 사용량을 백분율로 변환
-          const namespaceMetrics = data.map((pod) => ({
-            studentName: pod.metadata.annotations["student-name"] || "Unknown", // 학생 이름
-            namespace: namespace, // 네임스페이스 이름
-            cpu:
-              totalCpuUsage > 0
-                ? (parseInt(pod.usage.cpu.replace("m", ""), 10) /
-                    totalCpuUsage) *
-                  100
-                : 0, // CPU 사용량 백분율
-          }));
+      //namespaces: 부모 컴포넌트에서 전달된 네임스페이스 목록
+      const allMetrics = namespaces.flatMap((namespace) => {
+        const namespaceData = data[namespace] || []; //서버에서 수신한 데이터 중 특정네임스페이스에 해당한느 데이터배열
+        //서버에서 namespace-pod가 data에 저장되어있어야함. ***************
+        //namespaceData: 특정 네임스페이스의 pod데이터배열
 
-          allMetrics.push(...namespaceMetrics); // 결과 병합
-        } catch (error) {
-          console.error(
-            `Error fetching data for namespace ${namespace}:`,
-            error
-          );
-        }
-      }
+        const totalCpuUsage = namespaceData.reduce(
+          //모든 pod의 cpu사용량 합산해서 저장한거
+          (total, pod) => total + parseInt(pod.usage.cpu.replace("m", ""), 10),
+          0
+        );
 
-      setPodMetrics(allMetrics); // 상태 업데이트
+        const totalMemoryUsage = namespaceData.reduce(
+          (total, pod) =>
+            total + parseInt(pod.usage.memory.replace("Mi", ""), 10),
+          0
+        );
+
+        return namespaceData.map((pod) => ({
+          studentName: pod.metadata.annotaions["student_name"] || "unknown",
+          namespace: namespace,
+          cpu:
+            totalCpuUsage > 0
+              ? (parseInt(pod.usage.cpu.replace("m", ""), 10) / totalCpuUsage) *
+                100
+              : 0,
+          memory:
+            totalMemoryUsage > 0
+              ? (parseInt(pod.usage.memory.replace("Mi", ""), 10) /
+                  totalMemoryUsage) *
+                100
+              : 0,
+        }));
+      });
+      setPodMetrics(allMetrics);
     };
 
-    const interval = setInterval(fetchMetrics, 10000); // 10초마다 데이터 갱신
-    fetchMetrics(); // 첫 데이터 호출
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 해제
+    //웹소켓 닫힐 때 처리
+    socket.onclose = () => {
+      console.log("WebSocket disconnected.");
+    };
+
+    return () => socket.close(); // 컴포넌트 언마운트 시 웹소켓 닫기
   }, [namespaces]);
 
   // Chart.js 데이터 구조
@@ -62,15 +74,22 @@ function PodGraph({ namespaces = [] }) {
     ), // X축 레이블
     datasets: [
       {
-        label: "CPU Usage (%)",
-        data: podMetrics.map((metric) => metric.cpu), // Y축 데이터
-        borderColor: "rgba(75, 192, 192, 1)", // 선 색상
-        backgroundColor: "rgba(75, 192, 192, 0.2)", // 영역 색상
+        label: activeTab === "cpu" ? "CPU Usage (%)" : "Memory Usage (%)",
+        data: podMetrics.map((metric) =>
+          activeTab === "cpu" ? metric.cpu : metric.memory
+        ), // Y축 데이터
+        borderColor:
+          activeTab === "cpu"
+            ? "rgba(75, 192, 192, 1)"
+            : "rgba(153, 102, 255, 1)", // 선 색상
+        backgroundColor:
+          activeTab === "cpu"
+            ? "rgba(75, 192, 192, 0.2)"
+            : "rgba(153, 102, 255, 0.2)", // 영역 색상
         fill: true, // 영역 채우기
       },
     ],
   };
-
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -95,7 +114,7 @@ function PodGraph({ namespaces = [] }) {
         beginAtZero: true,
         title: {
           display: true,
-          text: "CPU Usage (%)", // Y축 제목
+          text: datatype === "cpu" ? "CPU Usage (%)" : "Memory Usage (%)", // Y축 제목
         },
       },
     },
@@ -103,7 +122,11 @@ function PodGraph({ namespaces = [] }) {
 
   return (
     <div>
-      <h1>CPU Usage by Student</h1>
+      <h1>
+        {datatype === "cpu"
+          ? "CPU Usage by Student"
+          : "Memory Usage by Student"}
+      </h1>
       <Line data={chartData} options={chartOptions} />
     </div>
   );

@@ -2,15 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ResponsiveLine } from "@nivo/line";
-import "../css/Dashboard.css";
-import TextField from "@mui/material/TextField";
-import Checkbox from "@mui/material/Checkbox";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import "../css/Dash_CPU.css";
 //import Link from "@mui/material/Link";
 import styled from "styled-components";
-import Typography from "@mui/material/Typography";
-import Graph from "./PodGraph";
 import PodGraph from "./PodGraph";
 
 const Container = styled.div`
@@ -92,7 +86,44 @@ const LogoutBtn = styled.button`
   }
 `;
 
-function Dashboard() {
+const Buttons = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const QuitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #4b87ff;
+    color: white;
+  }
+`;
+
+const ExitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #f91010;
+    color: white;
+  }
+`;
+
+function Dash_CPU() {
   const [datatype, setdatatype] = useState("cpu");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
   const handleLogout = () => {
@@ -150,11 +181,16 @@ function Dashboard() {
               "namespace3",
               "namespace4",
             ]}
+            datatype={datatype}
           />
+          <Buttons>
+            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
+            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+          </Buttons>
         </WhiteBoard>
       </Container>
     </div>
   );
 }
 
-export default Dashboard;
+export default Dash_CPU;

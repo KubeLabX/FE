@@ -5,7 +5,8 @@ import Signup from "./components/Signup";
 import Main from "./components/Main";
 import Dash_Student from "./components/Dash_Student";
 import Dash_Professor from "./components/Dash_Professor";
-import Dashboard from "./components/Dashboard";
+import Dash_CPU from "./components/Dash_CPU";
+import Dash_Mem from "./components/Dash_Mem";
 import PodGraph from "./components/PodGraph";
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/main" element={<Main />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dash_cpu" element={<Dash_CPU />} />
+          <Route path="/dash_mem" element={<Dash_Mem />} />
           <Route path="/dash_stu" element={<Dash_Student />} />
           <Route path="/dash_pro" element={<Dash_Professor />} />
           <Route path="/podgraph" element={<PodGraph />} />
