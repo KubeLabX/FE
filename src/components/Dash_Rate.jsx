@@ -131,6 +131,23 @@ function Dash_Rate() {
   };
   const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
+  const studentProgress = [
+    { name: "홍길동", id: "1234567", progress: 50 },
+    { name: "신짱구", id: "1234567", progress: 0 },
+    { name: "이수만", id: "1234567", progress: 30 },
+    { name: "유재석", id: "1234567", progress: 40 },
+    { name: "이광수", id: "1234567", progress: 50 },
+    { name: "강호동", id: "1234567", progress: 60 },
+    { name: "신동엽", id: "1234567", progress: 50 },
+    { name: "홍길동", id: "1234567", progress: 70 },
+    { name: "신짱구", id: "1234567", progress: 0 },
+    { name: "이수만", id: "1234567", progress: 30 },
+    { name: "유재석", id: "1234567", progress: 65 },
+    { name: "이광수", id: "1234567", progress: 50 },
+    { name: "강호동", id: "1234567", progress: 55 },
+    { name: "신동엽", id: "1234567", progress: 50 },
+  ];
+
   return (
     <div className="dash">
       <Container>
