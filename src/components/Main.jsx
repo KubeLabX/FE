@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import { ClassCreate, ClassJoin } from './Modal';
+import api from '../api/axios';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -159,25 +160,16 @@ const PlusBtn = styled.button`
 
 function Main() {
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
   //추구 DB에서 데이터 받아올 예정
-  const [userRole, setUserRole] = useState("student");
-  const [userName, setUserName] = useState("이영진");
-  const [classes, setClasses] = useState([
-    {
-      name: "컴퓨터과학 개론",
-      studentCount: 42,
-      createdDate: "2023-03-15",
-      teacherName: "김교수",
-      joinDate: "2023-03-18"
-    },
-    {
-      name: "웹 프로그래밍",
-      studentCount: 35,
-      createdDate: "2023-03-20",
-      teacherName: "박교수",
-      joinDate: "2023-03-22"
-    },
-  ]);
+  const [classes, setClasses] = useState([]);
+  //장고에서 받아오거나, 혹은 localStorage에 로그인 시 저장해두고 받아오기(현재에는 일단 임시저장)
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+
+  //모달 창 여부(클릭 시에만 true)
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenProfessorModal = () => {
@@ -187,6 +179,51 @@ function Main() {
   const handleOpenStudentModal = () => {
     setIsModalOpen(true);
   };
+
+  //수업 클릭 시
+  const handleClassClick = (classItem) => {
+    if (userRole === 't') {
+      navigate(`/professor/course/${classItem.course_id}`);
+    } else {
+      navigate(`/student/course/${classItem.course_id}`);
+    }
+  };
+
+  // fetch함수(백에서 데이터 가지고 오기)
+  const fetchClasses = async () => {
+    try {
+      const response = await api.get('/course/list');
+
+      const classes = response.data.courses.map(course => ({
+        name: course.name,
+        course_id: id,
+        ...(userRole === 't'
+          //강사인 경우, 참여인원과 생성날짜를 반환
+          ? {
+            studentCount: course.participant_count,
+            createdDate: new Date(course.created_at).toLocaleDateString()
+          }
+          //학생인 경우, 교수님 성함과 참여날짜를 받음
+          : {
+            teacherName: course.teacher_name,
+            createdDate: new Date(course.created_at).toLocaleDateString()
+          }
+        )
+      }));
+
+      setUserName(response.data.name);
+      setUserRole(response.data.role);
+      setClasses(classes);
+    } catch (error) {
+      console.error('Failed to fetch courses:', error);
+      setError('강의 목록을 불러오는데 실패했습니다.');
+    }
+  };
+
+  // fetchClasses 호출
+  useEffect(() => {
+    fetchClasses();
+  }, [userRole]); //초기 role이 변경될때(-> 추후 변경 혹은 굳이?)
 
   const Ifprofessor = () => (
     <div>
@@ -202,7 +239,7 @@ function Main() {
         <>
           <ClassList>
             {classes.map((classItem, index) => (
-              <ClassCard key={index}>
+              <ClassCard key={index} onClick={() => handleClassClick(classItem)}>
                 <ClassName>{classItem.name}</ClassName>
                 <ClassDetail><strong>참여인원: {classItem.studentCount}명</strong></ClassDetail>
                 <ClassDate>생성일: {classItem.createdDate}</ClassDate>
@@ -229,7 +266,7 @@ function Main() {
         <>
           <ClassList>
             {classes.map((classItem, index) => (
-              <ClassCard key={index}>
+              <ClassCard key={index} onClick={() => handleClassClick(classItem)}>
                 <ClassName>{classItem.name}</ClassName>
                 <ClassDetail><strong>담당교수: {classItem.teacherName}</strong></ClassDetail>
                 <ClassDate>참여일: {classItem.joinDate}</ClassDate>
@@ -255,16 +292,16 @@ function Main() {
         </NavRight>
       </Navbar>
       <WhiteBoard>
-        {userRole === "professor" ? (
+        {userRole === "t" ? (
           <>
             <Ifprofessor />
             <ClassCreate
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onSubmit={(projectName) => {
-                // Handle project creation
-                setIsModalOpen(false);
-              }}
+            // onSubmit={(projectName) => {
+            //   // Handle project creation
+            //   setIsModalOpen(false);
+            // }}
             />
           </>
         ) : (
@@ -273,10 +310,10 @@ function Main() {
             <ClassJoin
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onSubmit={(classCode) => {
-                // Handle class joining
-                setIsModalOpen(false);
-              }}
+            // onSubmit={(classCode) => {
+            //   // Handle class joining
+            //   setIsModalOpen(false);
+            // }}
             />
           </>
         )}

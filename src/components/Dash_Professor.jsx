@@ -92,6 +92,8 @@ const LogoutBtn = styled.button`
 `;
 
 function Dashboard() {
+  const { courseId } = useParams();
+  const [courseData, setCourseData] = useState(null);
   const [datatype, setdatatype] = useState("cpu");
   const navigate = useNavigate(); // useNavigate로 navigate 정의
   const [userName, setUserName] = useState("강사");
@@ -99,6 +101,21 @@ function Dashboard() {
     navigate("/"); // 로그아웃 시 /login으로 이동
   };
   const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const response = await api.get(`/course/${courseId}`);
+        setCourseData(response.data);
+      } catch (error) {
+        console.error('Failed to fetch course data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [courseId]);
 
   return (
     <div className="dash">
@@ -121,7 +138,7 @@ function Dashboard() {
               justifyContent: "space-between",
             }}
           >
-            <h1>클라우드 시스템</h1>
+            <h1>{courseData.name}</h1>
             <DataButtonGroup>
               <DataButton
                 onClick={() => setdatatype("cpu")}

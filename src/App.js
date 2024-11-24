@@ -24,6 +24,9 @@ function App() {
           <Route path="/dash_stu" element={<Dash_Student />} />
           <Route path="/dash_pro" element={<Dash_Professor />} />
           <Route path="/podgraph" element={<PodGraph />} />
+
+          <Route path="/professor/course/:courseId" element={<Dash_Professor />} />
+          <Route path="/student/course/:courseId" element={<Dash_Student />} />
         </Routes>
       </div>
     </Router>

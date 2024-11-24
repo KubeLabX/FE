@@ -180,7 +180,9 @@ const ExitBtn = styled.button`
 `;
 
 function Dash_Student() {
+  const { courseId } = useParams();
   const navigate = useNavigate();
+  const [courseData, setCourseData] = useState(null);
   const [userName, setUserName] = useState("이영진");
   const [todos, setTodos] = useState([
     { id: 1, text: "lab6 디렉토리 만들기", completed: false },
@@ -192,6 +194,21 @@ function Dash_Student() {
   // ref 추가
   const terminalRef = useRef(null);
   const terminalInstance = useRef(null);
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const response = await api.get(`/course/${courseId}`);
+        setCourseData(response.data);
+      } catch (error) {
+        console.error('Failed to fetch course data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [courseId]);
 
 
   const toggleTodo = (id) => {
@@ -267,7 +284,7 @@ function Dash_Student() {
         term.dispose();
       };
     }
-  }, []); //추후 pod 생성 및 연결 필요
+  }, []); //추후 pod 생성 및 연결 필요----------------------------------------
 
   return (
     <Container>
@@ -275,7 +292,7 @@ function Dash_Student() {
         <Navbar>
           <NavLeft>
             <Title>
-              클라우드 시스템
+              {courseData.name}
             </Title>
           </NavLeft>
           <NavRight>

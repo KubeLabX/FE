@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import styled from 'styled-components';
+import api from '../api/axios';
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -99,14 +100,31 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
+const ClassCreate = ({ isOpen, onClose }) => {
   const [projectName, setProjectName] = useState('');
+  const [error, setError] = useState(''); // 추가 필요
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(projectName);
-    setProjectName('');
+    if (!projectName.trim()) {
+      setError('수업명을 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 수업 생성 요청
+      await api.post('/course/create', {
+        name: projectName
+      });
+
+      // 성공하면 교수 대시보드로 이동 -> 추후 아이디 전달해서 해당 페이지
+      navigate('/dash_pro');
+
+    } catch (error) {
+      console.error('Failed to create course:', error);
+      setError(error.response?.data?.message || '수업 생성에 실패했습니다.');
+    }
   };
 
   return (
@@ -121,7 +139,6 @@ const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
         />
         <ModalButton
           type="submit"
-          onClick={() => navigate("/dash_pro")}
         >
           생성하기
         </ModalButton>
@@ -130,14 +147,31 @@ const ClassCreate = ({ isOpen, onClose, onSubmit }) => {
   );
 };
 
-const ClassJoin = ({ isOpen, onClose, onSubmit }) => {
+const ClassJoin = ({ isOpen, onClose }) => {
   const [classCode, setClassCode] = useState('');
+  const [error, setError] = useState(''); // 추가 필요
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(classCode);
-    setClassCode('');
+    if (!classCode.trim()) {
+      setError('수업코드를 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 수업 참여 요청
+      await api.post('/course/register', {
+        code: classCode
+      });
+
+      // 성공하면 학생 대시보드로 이동
+      navigate('/dash_stu');
+
+    } catch (error) {
+      console.error('Failed to join course:', error);
+      setError(error.response?.data?.message || '수업 참여에 실패했습니다.');
+    }
   };
 
   return (
@@ -152,7 +186,6 @@ const ClassJoin = ({ isOpen, onClose, onSubmit }) => {
         />
         <ModalButton
           type="submit"
-          onClick={() => navigate("/dash_stu")}
         >
           입장하기
         </ModalButton>
