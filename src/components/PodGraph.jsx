@@ -11,7 +11,7 @@ function PodGraph({ namespaces = [], datatype }) {
 
   useEffect(() => {
     // 컴포넌트가 처음 렌더링될 때와 namespaces 값이 변경될 때 실행됨
-
+    /*
     //웹소켓 초기화
     const socket = new WebSocket("ws://your-websocket-endpoint"); //실제 서버의 웹소켓 URL로 바꿔야함
     //서버의 ws://yy-w-e에 연결. 데이터 실시간 수신할 준비 완.
@@ -63,9 +63,34 @@ function PodGraph({ namespaces = [], datatype }) {
     socket.onclose = () => {
       console.log("WebSocket disconnected.");
     };
-
-    return () => socket.close(); // 컴포넌트 언마운트 시 웹소켓 닫기
+    */
+    // 하드코딩된 데이터 설정
+    const sampleData = [
+      {
+        studentName: "홍길동",
+        namespace: "namespace1",
+        cpu: 30,
+        memory: 40,
+      },
+      {
+        studentName: "신짱구",
+        namespace: "namespace2",
+        cpu: 50,
+        memory: 20,
+      },
+      {
+        studentName: "이광수",
+        namespace: "namespace3",
+        cpu: 20,
+        memory: 60,
+      },
+    ];
+    setPodMetrics(sampleData);
+    //return () => socket.close(); // 컴포넌트 언마운트 시 웹소켓 닫기
   }, [namespaces]);
+
+  // 임시 데이터 설정
+  //setPodMetrics(allMetrics);
 
   // Chart.js 데이터 구조
   const chartData = {
