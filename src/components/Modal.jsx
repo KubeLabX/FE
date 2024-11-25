@@ -102,28 +102,38 @@ const Modal = ({ isOpen, onClose, children }) => {
 
 const ClassCreate = ({ isOpen, onClose }) => {
   const [projectName, setProjectName] = useState('');
-  const [error, setError] = useState(''); // 추가 필요
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!projectName.trim()) {
       setError('수업명을 입력해주세요.');
       return;
     }
 
+    setIsSubmitting(true);
+    setError('');
+
     try {
-      // 수업 생성 요청
-      await api.post('/course/create', {
-        name: projectName
+      const response = await api.post('/course/create/', {
+        name: projectName.trim()
       });
 
-      // 성공하면 교수 대시보드로 이동 -> 추후 아이디 전달해서 해당 페이지
-      navigate('/dash_pro');
+      alert(`수업이 생성되었습니다. 수업 코드: ${response.data.course_code}`);
+      navigate(`/dash_pro`); //추후 수정 필요
+      onClose();
 
     } catch (error) {
-      console.error('Failed to create course:', error);
-      setError(error.response?.data?.message || '수업 생성에 실패했습니다.');
+      if (error.response?.status === 403) {
+        setError('수업 생성 권한이 없습니다.');
+      } else {
+        setError('수업 생성에 실패했습니다.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,28 +159,41 @@ const ClassCreate = ({ isOpen, onClose }) => {
 
 const ClassJoin = ({ isOpen, onClose }) => {
   const [classCode, setClassCode] = useState('');
-  const [error, setError] = useState(''); // 추가 필요
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!classCode.trim()) {
-      setError('수업코드를 입력해주세요.');
+
+    const trimmedCode = classCode.trim();
+    if (!trimmedCode) {
+      setError('수업 코드를 입력해주세요.');
       return;
     }
 
+    setIsSubmitting(true);
+    setError('');
+
     try {
-      // 수업 참여 요청
-      await api.post('/course/register', {
-        code: classCode
+      const response = await api.post('/course/register/', {
+        code: trimmedCode
       });
 
-      // 성공하면 학생 대시보드로 이동
-      navigate('/dash_stu');
+      alert(`${response.data.course_name} 수업에 참여완료되었습니다.`);
+      navigate('/dash_stu'); //추후 이동 url수정 필요
+      onClose();
 
     } catch (error) {
-      console.error('Failed to join course:', error);
-      setError(error.response?.data?.message || '수업 참여에 실패했습니다.');
+      if (error.response?.status === 404) {
+        setError('존재하지 않는 수업 코드입니다.');
+      } else if (error.response?.status === 400 && error.response.data.error.includes('already registered')) {
+        setError('이미 참여한 수업입니다.');
+      } else {
+        setError('수업 참여에 실패했습니다.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

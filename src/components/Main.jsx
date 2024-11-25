@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import { ClassCreate, ClassJoin } from './Modal';
+import { handleLogout } from "../services/logout";
 import api from '../api/axios';
 
 const Container = styled.div`
@@ -164,7 +165,6 @@ function Main() {
   //추구 DB에서 데이터 받아올 예정
   const [classes, setClasses] = useState([]);
   //장고에서 받아오거나, 혹은 localStorage에 로그인 시 저장해두고 받아오기(현재에는 일단 임시저장)
-  const userData = JSON.parse(localStorage.getItem('user'));
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
 
@@ -189,41 +189,54 @@ function Main() {
     }
   };
 
-  // fetch함수(백에서 데이터 가지고 오기)
+  //수업 list 받아오는 함수
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/course/list');
+      const response = await api.get('/course/list/');
 
+      //서버에서 보낸 username, role저장
+      setUserName(response.data.name);
+      const role = response.data.role;
+      setUserRole(role);
+
+      //class데이터 받기
       const classes = response.data.courses.map(course => ({
         name: course.name,
-        course_id: id,
-        ...(userRole === 't'
-          //강사인 경우, 참여인원과 생성날짜를 반환
+        course_id: course.id,
+        ...(role === 't'
           ? {
             studentCount: course.participant_count,
             createdDate: new Date(course.created_at).toLocaleDateString()
           }
-          //학생인 경우, 교수님 성함과 참여날짜를 받음
           : {
             teacherName: course.teacher_name,
             createdDate: new Date(course.created_at).toLocaleDateString()
-          }
-        )
+          })
       }));
-
-      setUserName(response.data.name);
-      setUserRole(response.data.role);
       setClasses(classes);
+
     } catch (error) {
-      console.error('Failed to fetch courses:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        setError('인증에 실패했습니다. 다시 로그인해주세요.');
+        navigate('/');
+        return;
+      }
       setError('강의 목록을 불러오는데 실패했습니다.');
     }
   };
 
-  // fetchClasses 호출
+  //추후 언마운트 시
   useEffect(() => {
-    fetchClasses();
-  }, [userRole]); //초기 role이 변경될때(-> 추후 변경 혹은 굳이?)
+    let mounted = true;  // 컴포넌트 마운트 상태 추적
+
+    const loadData = async () => {
+      if (!mounted) return;  // 언마운트된 경우 실행 중지
+      await fetchClasses();
+    };
+
+    loadData();
+    return () => mounted = false;  // 컴포넌트 언마운트 시 플래그 변경
+  }, []);
 
   const Ifprofessor = () => (
     <div>
@@ -269,7 +282,7 @@ function Main() {
               <ClassCard key={index} onClick={() => handleClassClick(classItem)}>
                 <ClassName>{classItem.name}</ClassName>
                 <ClassDetail><strong>담당교수: {classItem.teacherName}</strong></ClassDetail>
-                <ClassDate>참여일: {classItem.joinDate}</ClassDate>
+                <ClassDate>참여일: {classItem.createdDate}</ClassDate>
               </ClassCard>
             ))}
           </ClassList>
@@ -286,7 +299,7 @@ function Main() {
         </NavLeft>
         <NavRight>
           <UserName><strong>{userName}</strong>님이 로그인중</UserName>
-          <LogoutBtn onClick={() => navigate("/")}>
+          <LogoutBtn onClick={handleLogout} >
             로그아웃
           </LogoutBtn>
         </NavRight>

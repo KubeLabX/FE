@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from "styled-components";
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
+import api from '../api/axios';
+import { handleLogout } from "../services/logout";
 
 
 const Container = styled.div`
@@ -195,20 +197,19 @@ function Dash_Student() {
   const terminalRef = useRef(null);
   const terminalInstance = useRef(null);
 
-  useEffect(() => {
-    const fetchCourseData = async () => {
-      try {
-        const response = await api.get(`/course/${courseId}`);
-        setCourseData(response.data);
-      } catch (error) {
-        console.error('Failed to fetch course data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //추후 연결 시
+  // useEffect(() => {
+  //   const fetchCourseData = async () => {
+  //     try {
+  //       const response = await api.get(`/course/${courseId}`);
+  //       setCourseData(response.data);
+  //     } catch (error) {
+  //       console.error('Failed to fetch course data:', error);
+  //     }
+  //   };
 
-    fetchCourseData();
-  }, [courseId]);
+  //   fetchCourseData();
+  // }, [courseId]);
 
 
   const toggleTodo = (id) => {
@@ -292,12 +293,12 @@ function Dash_Student() {
         <Navbar>
           <NavLeft>
             <Title>
-              {courseData.name}
+              수업명
             </Title>
           </NavLeft>
           <NavRight>
             <UserName><strong>{userName}</strong>님이 로그인중</UserName>
-            <LogoutBtn onClick={() => navigate("/")}>
+            <LogoutBtn onClick={handleLogout}>
               로그아웃
             </LogoutBtn>
           </NavRight>

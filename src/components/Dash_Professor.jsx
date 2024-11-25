@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ResponsiveLine } from "@nivo/line";
 import "../css/Dash_CPU.css";
 import TextField from "@mui/material/TextField";
@@ -11,6 +11,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import styled from "styled-components";
 import Typography from "@mui/material/Typography";
 import Graph from "./PodGraph";
+import api from '../api/axios';
+import { handleLogout } from "../services/logout";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -102,20 +104,19 @@ function Dashboard() {
   };
   const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
-  useEffect(() => {
-    const fetchCourseData = async () => {
-      try {
-        const response = await api.get(`/course/${courseId}`);
-        setCourseData(response.data);
-      } catch (error) {
-        console.error('Failed to fetch course data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //추후 연결 시
+  // useEffect(() => {
+  //   const fetchCourseData = async () => {
+  //     try {
+  //       const response = await api.get(`/course/${courseId}`);
+  //       setCourseData(response.data);
+  //     } catch (error) {
+  //       console.error('Failed to fetch course data:', error);
+  //     }
+  //   };
 
-    fetchCourseData();
-  }, [courseId]);
+  //   fetchCourseData();
+  // }, [courseId]);
 
   return (
     <div className="dash">
@@ -138,7 +139,7 @@ function Dashboard() {
               justifyContent: "space-between",
             }}
           >
-            <h1>{courseData.name}</h1>
+            <h1>수업명</h1>
             <DataButtonGroup>
               <DataButton
                 onClick={() => setdatatype("cpu")}

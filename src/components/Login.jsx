@@ -73,18 +73,19 @@ export default function App() {
   const [userData, setUserData] = useState({
     user_id: "",
     password: "",
-    user_type: "",
+    usertype: "",
   });
 
   const navigate = useNavigate();
 
-  // 체크박스에서 학생/강사 선택 시 처리
+  // 체크박스 처리 로직 수정
   const handleChange = (event) => {
-    setSelectedOption(event.target.value);
-    setUserData({
-      ...userData,
-      user_type: event.target.value === "학생" ? "s" : "t",
-    });
+    const value = event.target.value; // "학생" 또는 "강사"
+    setSelectedOption(value);
+    setUserData(prev => ({
+      ...prev,
+      usertype: value  // usertype에 "학생" 또는 "강사" 저장 -> 추후 handleLogin에서 추가처리
+    }));
   };
 
   // 회원가입 페이지로 이동
