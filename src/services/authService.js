@@ -11,7 +11,7 @@ export const handleSignUp = async (userData) => {
 
     console.log("Sending data:", formattedData); // 데이터 확인용 로그
 
-    const response = await fetch(`${API_URL}/signup/`, {
+    const response = await fetch("${API_URL}/signup/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,18 +47,17 @@ export const handleSignUp = async (userData) => {
 
 // src/services/authService.js
 export const handleLogin = async (userData) => {
-  const API_URL = process.env.REACT_APP_API_URL;
   try {
     // 서버가 기대하는 데이터 형식으로 변환
     const formattedData = {
       user_id: userData.user_id, // studentId -> user_id
       password: userData.password,
-      user_type: userData.usertype === "학생" ? "s" : "t" // "학생"/"강사" -> "s"/"t"
+      user_type: userData.usertype === "학생" ? "s" : "t", // "학생"/"강사" -> "s"/"t"
     };
 
     console.log("Sending data:", formattedData); // 요청 데이터 확인용 로그
 
-    const response = await fetch(`${API_URL}/login/`, {
+    const response = await fetch("${API_URL}/login/", {
       method: "POST", // POST 메소드로 로그인 요청
       headers: {
         "Content-Type": "application/json", // JSON 형식으로 데이터 전송
