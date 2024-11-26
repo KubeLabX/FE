@@ -42,7 +42,7 @@ const InputField = {
     },
   },
   width: "350px",
-  marginBottom: "15px",
+  marginBottom: "0px",
 };
 
 const checkboxStyle = {
@@ -67,6 +67,13 @@ const labelStyle = {
   },
   marginRight: "16px",
 };
+const FormWrapper = styled.div`
+  display: flex;
+  flex-direction: column; /* 모든 자식 요소들을 수직 정렬 */
+  margin-bottom: 0px;
+  align-items: center; /* 중앙 정렬 */
+  /*width: 100%; 부모 요소의 너비를 꽉 채움 */
+`;
 
 function Signup() {
   const navigate = useNavigate();
@@ -162,60 +169,64 @@ function Signup() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="이름"
-            required
-            name="name"
-            autoFocus
-            value={userData.name}
-            onChange={(e) => setUserData({ ...userData, name: e.target.value })}
-            sx={InputField}
-          />
-          <br />
-          <TextField
-            label="학번/교번"
-            value={userData.studentId}
-            required
-            name="studentId"
-            autoFocus
-            onChange={(e) =>
-              setUserData({ ...userData, studentId: e.target.value })
-            }
-            sx={InputField}
-          />
-          <br />
-          <TextField
-            label="비밀번호"
-            type="password"
-            required
-            name="password"
-            autoComplete="current-password"
-            onChange={(e) =>
-              setUserData({ ...userData, password: e.target.value })
-            }
-            sx={InputField}
-          />
-          <br />
-          <TextField
-            label="비밀번호 확인"
-            type="password"
-            required
-            name="confirmPassword"
-            autoComplete="current-password"
-            value={userData.confirmPassword}
-            onChange={(e) =>
-              setUserData({ ...userData, confirmPassword: e.target.value })
-            }
-            sx={InputField}
-          />
-          <br />
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ marginTop: "16px", width: "300px" }}
-          >
-            회원 가입
-          </Button>
+          <FormWrapper>
+            <TextField
+              label="이름"
+              required
+              name="name"
+              autoFocus
+              value={userData.name}
+              onChange={(e) =>
+                setUserData({ ...userData, name: e.target.value })
+              }
+              sx={InputField}
+            />
+            <br />
+            <TextField
+              label="학번/교번"
+              value={userData.studentId}
+              required
+              name="studentId"
+              autoFocus
+              onChange={(e) =>
+                setUserData({ ...userData, studentId: e.target.value })
+              }
+              sx={InputField}
+            />
+            <br />
+            <TextField
+              label="비밀번호"
+              type="password"
+              required
+              name="password"
+              autoComplete="current-password"
+              onChange={(e) =>
+                setUserData({ ...userData, password: e.target.value })
+              }
+              sx={InputField}
+            />
+            <br />
+            <TextField
+              label="비밀번호 확인"
+              type="password"
+              required
+              name="confirmPassword"
+              autoComplete="current-password"
+              value={userData.confirmPassword}
+              onChange={(e) =>
+                setUserData({ ...userData, confirmPassword: e.target.value })
+              }
+              sx={InputField}
+            />
+            <br />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ marginTop: "16px", width: "300px" }}
+            >
+              회원 가입
+            </Button>
+          </FormWrapper>
         </form>
 
         <p>
