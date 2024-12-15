@@ -11,7 +11,7 @@ export const handleSignUp = async (userData) => {
 
     console.log("Sending data:", formattedData); // 데이터 확인용 로그
 
-    const response = await fetch("${API_URL}/signup/", {
+    const response = await fetch(`${API_URL}/signup/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export const handleLogin = async (userData) => {
 
     console.log("Sending data:", formattedData); // 요청 데이터 확인용 로그
 
-    const response = await fetch("${API_URL}/login/", {
+    const response = await fetch(`${API_URL}/login/`, {
       method: "POST", // POST 메소드로 로그인 요청
       headers: {
         "Content-Type": "application/json", // JSON 형식으로 데이터 전송
