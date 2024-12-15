@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import api from '../api/axios';
 
 // Modal 관련 스타일
 const ModalOverlay = styled.div`
@@ -89,6 +90,13 @@ const ExistingTodoContainer = styled.div`
   border-radius: 8px;
 `;
 
+const NoTodoMessage = styled.div`
+  color: #6B7280;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 10px;
+`;
+
 const ExistingTodoContent = styled.div`
   padding: 8px;
   border-bottom: 1px solid #e5e7eb;
@@ -119,72 +127,106 @@ const Divider = styled.div`
   }
 `;
 
+const TodoModal = ({ isOpen, onClose, courseId }) => {
+  const [todos, setTodos] = useState(['']); // 새로운 Todo 입력 필드 상태
+  const [existodo, setExistodo] = useState([]); // 서버에서 가져올 기존 Todo 목록
+  const [courseName, setCourseName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-const TodoModal = ({ isOpen, onClose, onSubmit }) => {
-    const [todos, setTodos] = useState(['']);
-    const [existodo, setexistodo] = useState([
-        { id: 1, text: "lab6 디렉토리 만들기", completed: false },
-        { id: 2, text: "lab7 디렉토리 만들기", completed: false },
-        { id: 3, text: "lab8 디렉토리 만들기", completed: false },
-        { id: 4, text: "lab9 디렉토리 만들기", completed: false },
-    ]);
+  // 서버에서 기존 Todo 목록 가져오기
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const courseResponse = await api.get(`/course/${courseId}`);
+        setCourseName(courseResponse.data.course_name);
+        setUserName(courseResponse.data.user_name);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (todos.trim()) {
-            onSubmit(todos);
-            setTodos('');
-            onClose();
-        }
+        const todoResponse = await api.get(`/course/${courseId}/list`);
+        setExistodo(todoResponse.data.todo_list);
+      } catch (error) {
+        setError('Failed to fetch data');
+        console.error('Failed to fetch data:', error);
+      }
     };
 
-    const handleInputChange = (index, value) => {
-        const newTodos = [...todos];
-        newTodos[index] = value;
-        setTodos(newTodos);
-    };
+    if (isOpen) fetchData();
+  }, [courseId, isOpen]);
 
-    const addNewInput = () => {
-        setTodos([...todos, '']);
-    };
+  // 새로운 Todo 서버로 전송 및 상태 업데이트
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    if (!isOpen) return null;
+    const nonEmptyTodos = todos.filter(todo => todo.trim() !== '');
+    if (nonEmptyTodos.length === 0) return;
 
-    return (
-        <ModalOverlay onClick={onClose}>
-            <ModalContent onClick={e => e.stopPropagation()}>
-                <ModalTitle>실습 목록 추가하기</ModalTitle>
-                <ExistingTodoContainer>
-                    {existodo.map(todo => (
-                        <ExistingTodoContent key={todo.id}>
-                            {todo.text}
-                        </ExistingTodoContent>
-                    ))}
-                </ExistingTodoContainer>
+    try {
+      setIsSubmitting(true);
+      const response = await api.post(`/course/${courseId}/add`, { todos: nonEmptyTodos });
+      setExistodo(prev => [...prev, ...response.data.todos]); // 서버에서 반환된 todos 추가
+      setTodos(['']); // 입력 필드 초기화
+    } catch (error) {
+      console.error('Todo 추가 중 오류 발생:', error);
+      setError('Failed to add to-do(s).');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-                <Divider />
-                <form onSubmit={handleSubmit}>
-                    {todos.map((todo, index) => (
-                        <TodoInputContainer key={index}>
-                            <TodoInput
-                                type="text"
-                                value={todo}
-                                onChange={(e) => handleInputChange(index, e.target.value)}
-                                placeholder={`실습 목록 ${index + 1}`}
-                                autoFocus={index === 0}
-                            />
-                            {index === todos.length - 1 && (
-                                <AddMoreBtn type="button" onClick={addNewInput}>
-                                    + 항목 추가
-                                </AddMoreBtn>
-                            )}
-                        </TodoInputContainer>
-                    ))}
-                    <AddBtn type="submit">생성하기</AddBtn>
-                </form>
-            </ModalContent>
-        </ModalOverlay>
-    );
+  // 입력 필드 값 변경
+  const handleInputChange = (index, value) => {
+    const newTodos = [...todos];
+    newTodos[index] = value;
+    setTodos(newTodos);
+  };
+
+  // 새로운 입력 필드 추가
+  const addNewInput = () => {
+    setTodos([...todos, '']);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalContent onClick={e => e.stopPropagation()}>
+        <ModalTitle>실습 목록 추가하기</ModalTitle>
+        <ExistingTodoContainer>
+          {existodo.length === 0 ? (
+            <NoTodoMessage>TodoList가 없습니다.</NoTodoMessage>
+          ) : (
+            existodo.map(todo => (
+              <ExistingTodoContent key={todo.id}>
+                {todo.content}
+              </ExistingTodoContent>
+            ))
+          )}
+        </ExistingTodoContainer>
+
+        <Divider />
+        <form onSubmit={handleSubmit}>
+          {todos.map((todo, index) => (
+            <TodoInputContainer key={index}>
+              <TodoInput
+                type="text"
+                value={todo}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                placeholder={`실습 목록 ${index + 1}`}
+                autoFocus={index === 0}
+              />
+              {index === todos.length - 1 && (
+                <AddMoreBtn type="button" onClick={addNewInput}>
+                  + 항목 추가
+                </AddMoreBtn>
+              )}
+            </TodoInputContainer>
+          ))}
+          <AddBtn type="submit" disabled={isSubmitting}>{isSubmitting ? '처리 중...' : '생성하기'}</AddBtn>
+        </form>
+      </ModalContent>
+    </ModalOverlay>
+  );
 };
 
 export default TodoModal;

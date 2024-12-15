@@ -1,18 +1,13 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { ResponsiveLine } from "@nivo/line";
-import "../css/Dash_CPU.css";
-import TextField from "@mui/material/TextField";
-import Checkbox from "@mui/material/Checkbox";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-//import Link from "@mui/material/Link";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import Typography from "@mui/material/Typography";
 import Graph from "./PodGraph";
 import api from '../api/axios';
 import { handleLogout } from "../services/logout";
+import TodoModal from "./TodoModal";
+import CpuMonitor from "./Cpu";
+import MemoryMonitor from "./Memory";
+import RateTable from "./Ratetable";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -50,10 +45,10 @@ const DataButton = styled.button`
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  background-color: ${(props) => (props.active ? "#4f91ff" : "#ccc")};
-  color: ${(props) => (props.active ? "white" : "black")};
+  background-color: ${(props) => (props['data-active'] ? "#4f91ff" : "#ccc")};
+  color: ${(props) => (props['data-active'] ? "white" : "black")};
   &:hover {
-    background-color: ${(props) => (props.active ? "#3578e5" : "#ddd")};
+    background-color: ${(props) => (props['data-active'] ? "#3578e5" : "#ddd")};
   }
 `;
 
@@ -93,30 +88,139 @@ const LogoutBtn = styled.button`
   }
 `;
 
+const TodoText = styled.span`
+  flex: 1;
+  color: ${props => props.checked ? '#9CA3AF' : '#1F2937'};
+  text-decoration: ${props => props.checked ? 'line-through' : 'none'};
+`;
+
+const AddTodoButton = styled.button`
+  padding: 8px 16px;
+  color: #6B7280;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  white-space: nowrap;  // 텍스트 줄바꿈 방지
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &:hover {
+    color: #4B87FF;
+  }
+`;
+
+const ContentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
+
+const Buttons = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const QuitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #F3F4F6;
+  color: #4B5563;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #4B87FF;
+    color: white;
+  }
+`;
+
+const ExitBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #F3F4F6;
+  color: #4B5563;
+  cursor: pointer;
+  font-weight: bold;
+  
+  &:hover {
+    background-color: #F91010;
+    color: white;
+  }
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;  // 요소들 사이 간격
+`;
+
+const CourseTitle = styled.h1`
+  margin: 0;
+  white-space: nowrap;  
+`;
+
+const CourseCode = styled.h4`
+  font-size: 1.2rem;
+  margin-left: 10px;
+`;
+
+
 function Dashboard() {
   const { courseId } = useParams();
-  const [courseData, setCourseData] = useState(null);
+  const [courseCode, setcourseCode] = useState("");
   const [datatype, setdatatype] = useState("cpu");
-  const navigate = useNavigate(); // useNavigate로 navigate 정의
-  const [userName, setUserName] = useState("강사");
-  const handleLogout = () => {
-    navigate("/"); // 로그아웃 시 /login으로 이동
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [participants, setParticipants] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const namespaces = "example-namespace";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const courseResponse = await api.get(`/course/${courseId}`);
+        setCourseName(courseResponse.data.course_name);
+        setUserName(courseResponse.data.user_name);
+        setcourseCode(courseResponse.data.course_code)
+
+        if (datatype === "student") {
+          const progressResponse = await api.get(`/course/${courseId}/participants/`);
+          setParticipants(progressResponse.data.participants);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, [courseId, datatype]);
+
+  const renderContent = () => {
+    switch (datatype) {
+      case "cpu":
+        return <CpuMonitor namespaces={namespaces} />;
+      case "memory":
+        return <MemoryMonitor namespaces={namespaces} />;
+      case "student":
+        return <RateTable participants={participants} />;
+      default:
+        return null;
+    }
   };
-  const namespace = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
-  //추후 연결 시
-  // useEffect(() => {
-  //   const fetchCourseData = async () => {
-  //     try {
-  //       const response = await api.get(`/course/${courseId}`);
-  //       setCourseData(response.data);
-  //     } catch (error) {
-  //       console.error('Failed to fetch course data:', error);
-  //     }
-  //   };
-
-  //   fetchCourseData();
-  // }, [courseId]);
+  const handleAddTodo = (todo) => {
+    // TODO: DB에 todo 추가 로직
+    console.log("Added todo:", todo);
+  };
 
   return (
     <div className="dash">
@@ -132,36 +236,47 @@ function Dashboard() {
         </Navbar>
 
         <WhiteBoard>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <h1>수업명</h1>
+          <ContentHeader>
+            <TitleContainer>
+              <CourseTitle>{courseName}</CourseTitle>
+              <CourseCode>수업 코드: {courseCode}</CourseCode>
+              <AddTodoButton onClick={() => setIsModalOpen(true)}>
+                + TodoList 추가하기
+              </AddTodoButton>
+            </TitleContainer>
             <DataButtonGroup>
               <DataButton
                 onClick={() => setdatatype("cpu")}
-                active={datatype === "cpu"}
+                data-active={datatype === "cpu"}
               >
                 CPU 사용량
               </DataButton>
               <DataButton
                 onClick={() => setdatatype("memory")}
-                active={datatype === "memory"}
+                data-active={datatype === "memory"}
               >
                 메모리 사용량
               </DataButton>
               <DataButton
-                onClick={() => navigate("/dash_rate")}
-                active={datatype === "student"}
+                onClick={() => setdatatype("student")}
+                data-active={datatype === "student"}
               >
                 학생 실습률
               </DataButton>
             </DataButtonGroup>
-          </div>
-          <Graph namespace={namespace} />
+          </ContentHeader>
+
+          {renderContent()}
+
+          <Buttons>
+            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
+            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+          </Buttons>
+
+          <TodoModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            courseId={courseId} />
         </WhiteBoard>
       </Container>
     </div>

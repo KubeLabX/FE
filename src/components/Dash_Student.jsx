@@ -7,7 +7,6 @@ import 'xterm/css/xterm.css';
 import api from '../api/axios';
 import { handleLogout } from "../services/logout";
 
-
 const Container = styled.div`
   min-height: 100vh;
   background-color: #E6EEFF;  // 하늘색 배경
@@ -25,7 +24,7 @@ const WhiteBoard = styled.div`
   overflow-y: auto;   
 `;
 
-const NavbarContainer = styled.div`  // 새로 추가
+const NavbarContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -49,7 +48,6 @@ const NavRight = styled.div`
   gap: 10px;
 `;
 
-//메인 페이지 명을 할말
 const Title = styled.h1`
   font-size: 1.25rem;
   font-weight: bold;
@@ -129,19 +127,11 @@ const TodoText = styled.span`
   text-decoration: ${props => props.checked ? 'line-through' : 'none'};
 `;
 
-const AddTodoButton = styled.button`
-  display: flex;
-  align-items: center;
+const NoTodoMessage = styled.div`
+  text-align: center;
   color: #6B7280;
-  padding: 10px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  width: 100%;
-  
-  &:hover {
-    color: #4B87FF;
-  }
+  font-size: 1rem;
+  margin-top: 20px;
 `;
 
 const Buttons = styled.div`
@@ -184,42 +174,31 @@ const ExitBtn = styled.button`
 function Dash_Student() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const [courseData, setCourseData] = useState(null);
-  const [userName, setUserName] = useState("이영진");
-  const [todos, setTodos] = useState([
-    { id: 1, text: "lab6 디렉토리 만들기", completed: false },
-    { id: 2, text: "lab7 디렉토리 만들기", completed: false },
-    { id: 3, text: "lab8 디렉토리 만들기", completed: false },
-    { id: 4, text: "lab9 디렉토리 만들기", completed: false },
-  ]);
+  const [courseName, setCourseName] = useState(""); // Course name state
+  const [userName, setUserName] = useState(""); // User name state
+  const [todos, setTodos] = useState([]); // Todo list state
 
-  // ref 추가
   const terminalRef = useRef(null);
-  const terminalInstance = useRef(null);
-
-  //추후 연결 시
-  // useEffect(() => {
-  //   const fetchCourseData = async () => {
-  //     try {
-  //       const response = await api.get(`/course/${courseId}`);
-  //       setCourseData(response.data);
-  //     } catch (error) {
-  //       console.error('Failed to fetch course data:', error);
-  //     }
-  //   };
-
-  //   fetchCourseData();
-  // }, [courseId]);
-
-
-  const toggleTodo = (id) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
-  };
 
   useEffect(() => {
-    // 터미널 초기화
+    const fetchCourseData = async () => {
+      try {
+        const courseResponse = await api.get(`/course/${courseId}`);
+        setCourseName(courseResponse.data.course_name);
+        setUserName(courseResponse.data.user_name);
+
+        const todoResponse = await api.get(`/course/${courseId}/list`);
+        console.log('Fetched todos:', todoResponse.data.todo_list); // Debugging output
+        setTodos(todoResponse.data.todo_list);
+      } catch (error) {
+        console.error("Failed to fetch course or todo data:", error);
+      }
+    };
+
+    fetchCourseData();
+  }, [courseId]);
+
+  useEffect(() => {
     if (terminalRef.current) {
       const term = new Terminal({
         cursorBlink: true,
@@ -231,26 +210,21 @@ function Dash_Student() {
         }
       });
 
-      //임시 설정 터미널 ----------------------------------------
       const fitAddon = new FitAddon();
-      term.loadAddon(fitAddon); // 터미널에 FitAddon 추가
+      term.loadAddon(fitAddon);
       term.open(terminalRef.current);
-      fitAddon.fit(); // 컨테이너 크기에 맞게 조절
+      fitAddon.fit();
 
-      // 초기 메시지 출력
       term.writeln('Terminal Test Mode');
       term.writeln('Type something to test...');
       term.write('\r\n$ ');
 
-      // 키보드 입력 처리
       let commandBuffer = '';
 
       term.onData(data => {
-        // Enter key
         if (data === '\r') {
           term.write('\n');
           if (commandBuffer.trim().length > 0) {
-            // 간단한 명령어 처리
             if (commandBuffer === 'clear') {
               term.clear();
             } else {
@@ -259,42 +233,38 @@ function Dash_Student() {
           }
           commandBuffer = '';
           term.write('$ ');
-        }
-        // Backspace
-        else if (data === '\x7f') {
+        } else if (data === '\x7f') {
           if (commandBuffer.length > 0) {
             commandBuffer = commandBuffer.slice(0, -1);
             term.write('\b \b');
           }
-        }
-        // Regular input
-        else {
+        } else {
           commandBuffer += data;
           term.write(data);
         }
       });
 
-      // 창 크기 변경 처리
       const handleResize = () => fitAddon.fit();
       window.addEventListener('resize', handleResize);
-
-      terminalInstance.current = term;
 
       return () => {
         window.removeEventListener('resize', handleResize);
         term.dispose();
       };
     }
-  }, []); //추후 pod 생성 및 연결 필요----------------------------------------
+  }, []);
+
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
 
   return (
     <Container>
       <NavbarContainer>
         <Navbar>
           <NavLeft>
-            <Title>
-              수업명
-            </Title>
           </NavLeft>
           <NavRight>
             <UserName><strong>{userName}</strong>님이 로그인중</UserName>
@@ -305,20 +275,25 @@ function Dash_Student() {
         </Navbar>
       </NavbarContainer>
       <WhiteBoard>
+        <h1>{courseName}</h1>
         <BoardContent>
           <TerminalContainer ref={terminalRef} />
           <TodoListContainer>
             <TodoTitle>TodoList</TodoTitle>
-            {todos.map(todo => (
-              <TodoItem key={todo.id}>
-                <TodoCheckbox
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => toggleTodo(todo.id)}
-                />
-                <TodoText checked={todo.completed}>{todo.text}</TodoText>
-              </TodoItem>
-            ))}
+            {todos.length > 0 ? (
+              todos.map(todo => (
+                <TodoItem key={todo.id}>
+                  <TodoCheckbox
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => toggleTodo(todo.id)}
+                  />
+                  <TodoText checked={todo.completed}>{todo.content}</TodoText>
+                </TodoItem>
+              ))
+            ) : (
+              <NoTodoMessage>할 일이 없습니다.</NoTodoMessage>
+            )}
           </TodoListContainer>
         </BoardContent>
         <Buttons>
