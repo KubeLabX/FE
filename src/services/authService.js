@@ -86,7 +86,7 @@ export const handleLogin = async (userData) => {
     const data = await response.json(); // 서버의 응답을 JSON으로 파싱
     const accessToken = data.access_token; // 서버에서 반환한 access_token
     const refreshToken = data.refresh_token; //일단 저장
-    console.log("Received access token:", accessToken);
+    // console.log("Received access token:", accessToken);
 
     // access_token을 localStorage에 저장**(우선 refresh_token은 저장안함)
     localStorage.setItem("authToken", accessToken);

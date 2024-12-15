@@ -21,8 +21,6 @@ function App() {
           <Route path="/dash_cpu" element={<Dash_CPU />} />
           <Route path="/dash_mem" element={<Dash_Mem />} />
           <Route path="/dash_rate" element={<Dash_Rate />} />
-          <Route path="/dash_stu" element={<Dash_Student />} />
-          <Route path="/dash_pro" element={<Dash_Professor />} />
           <Route path="/podgraph" element={<PodGraph />} />
 
           <Route path="/professor/course/:courseId" element={<Dash_Professor />} />

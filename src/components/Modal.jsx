@@ -123,7 +123,7 @@ const ClassCreate = ({ isOpen, onClose }) => {
       });
 
       alert(`수업이 생성되었습니다. 수업 코드: ${response.data.course_code}`);
-      navigate(`/dash_pro`); //추후 수정 필요
+      navigate(`/professor/course/${response.data.course_id}`); // 생성된 수업의 교수자 페이지로 이동
       onClose();
 
     } catch (error) {
@@ -181,7 +181,7 @@ const ClassJoin = ({ isOpen, onClose }) => {
       });
 
       alert(`${response.data.course_name} 수업에 참여완료되었습니다.`);
-      navigate('/dash_stu'); //추후 이동 url수정 필요
+      navigate(`/student/course/${response.data.course_id}`); // 참여한 수업의 학생 페이지로 이동
       onClose();
 
     } catch (error) {

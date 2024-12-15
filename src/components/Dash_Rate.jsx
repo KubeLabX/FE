@@ -1,8 +1,9 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ResponsiveLine } from "@nivo/line";
 import "../css/Dash_CPU.css";
+import api from '../api/axios';
 //import Link from "@mui/material/Link";
 import styled from "styled-components";
 import PodGraph from "./PodGraph";
@@ -155,23 +156,25 @@ function Dash_Rate() {
   };
   const namespaces = "example-namespace"; // 사용할 namespace. pod의 namespace 받아오기
 
-  const studentProgress = [
-    //웹소켓 이용해서 가져오기
-    { name: "홍길동", id: "1234567", progress: 50 },
-    { name: "신짱구", id: "1234567", progress: 0 },
-    { name: "이수만", id: "1234567", progress: 30 },
-    { name: "유재석", id: "1234567", progress: 40 },
-    { name: "이광수", id: "1234567", progress: 50 },
-    { name: "강호동", id: "1234567", progress: 60 },
-    { name: "신동엽", id: "1234567", progress: 50 },
-    { name: "홍길동", id: "1234567", progress: 70 },
-    { name: "신짱구", id: "1234567", progress: 0 },
-    { name: "이수만", id: "1234567", progress: 30 },
-    { name: "유재석", id: "1234567", progress: 65 },
-    { name: "이광수", id: "1234567", progress: 50 },
-    { name: "강호동", id: "1234567", progress: 55 },
-    { name: "신동엽", id: "1234567", progress: 50 },
-  ];
+  const { courseId } = useParams();  // courseId 가져오기
+  const [participants, setParticipants] = useState([]);
+  const [courseName, setCourseName] = useState("");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchParticipants = async () => {
+      try {
+        const response = await api.get(`/course/${courseId}/progress/`);  // API 엔드포인트 수정
+        setParticipants(response.data.participants);
+        setCourseName(response.data.course_name);
+        setUserName(response.data.user_name);
+      } catch (error) {
+        console.error('Failed to fetch participants:', error);
+      }
+    };
+
+    fetchParticipants();
+  }, [courseId]);
 
   const handleAddTodo = (todo) => {
     // TODO: DB에 todo 추가 로직
@@ -297,25 +300,17 @@ function Dash_Rate() {
                 </thead>
 
                 <tbody>
-                  {studentProgress.map((student, index) => (
-                    <tr
-                      key={index}
-                      id={`student-row-${index}`}
-                      style={{
-                        borderBottom: "1px solid #ddd",
-                        textAlign: "center",
-                      }}
-                    >
+                  {participants.map((student, index) => (
+                    <tr key={index} id={`student-row-${index}`}
+                      style={{ borderBottom: "1px solid #ddd", textAlign: "center" }}>
                       <td style={{ padding: "10px" }}>
                         {student.name}({student.id})
                       </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          textAlign: "center",
-                          color: student.progress < 31 ? "green" : "black",
-                        }}
-                      >
+                      <td style={{
+                        padding: "10px",
+                        textAlign: "center",
+                        color: student.progress < 31 ? "green" : "black",
+                      }}>
                         {student.progress}%
                       </td>
                     </tr>

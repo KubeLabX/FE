@@ -181,13 +181,32 @@ function Main() {
   };
 
   //수업 클릭 시
-  const handleClassClick = (classItem) => {
-    if (userRole === 't') {
-      navigate(`/professor/course/${classItem.course_id}`);
-    } else {
-      navigate(`/student/course/${classItem.course_id}`);
+  // Main.js 파일의 handleClassClick 함수 수정
+  const handleClassClick = async (classItem) => {
+    try {
+      const response = await api.get(`/course/${classItem.course_id}`);
+
+      if (response.status === 200) {
+        // 성공적으로 수업 입장이 확인되면 해당 경로로 이동
+        if (userRole === 't') {
+          navigate(`/professor/course/${classItem.course_id}`);
+        } else {
+          navigate(`/student/course/${classItem.course_id}`);
+        }
+      }
+    } catch (error) {
+      if (error.response?.status === 403) {
+        alert('이 수업에 접근할 권한이 없습니다.');
+      } else if (error.response?.status === 404) {
+        alert('존재하지 않는 수업입니다.');
+      } else {
+        alert('수업 입장 중 오류가 발생했습니다.');
+      }
+      console.error('Error entering course:', error);
     }
   };
+
+
 
   //수업 list 받아오는 함수
   const fetchClasses = async () => {
