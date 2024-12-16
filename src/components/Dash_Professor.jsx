@@ -182,7 +182,20 @@ function Dashboard() {
   const [courseName, setCourseName] = useState("");
   const [participants, setParticipants] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const namespaces = "example-namespace";
+
+  const handleEndCourse = async () => {
+    const isConfirmed = window.confirm("정말로 이 수업을 종강하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+    if (isConfirmed) {
+      try {
+        await api.delete(`/course/${courseId}/end`);
+        navigate("/main");
+      } catch (error) {
+        console.error("Failed to end course:", error);
+        alert("수업 종강에 실패했습니다."); // 에러 알림 추가
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,9 +220,9 @@ function Dashboard() {
   const renderContent = () => {
     switch (datatype) {
       case "cpu":
-        return <CpuMonitor namespaces={namespaces} />;
+        return <CpuMonitor />;
       case "memory":
-        return <MemoryMonitor namespaces={namespaces} />;
+        return <MemoryMonitor />;
       case "student":
         return <RateTable participants={participants} />;
       default:
@@ -269,8 +282,8 @@ function Dashboard() {
           {renderContent()}
 
           <Buttons>
-            <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
-            <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+            <QuitBtn onClick={() => navigate("/main")}>실습 종료하기</QuitBtn>
+            <ExitBtn onClick={handleEndCourse}>수업 종강하기</ExitBtn>
           </Buttons>
 
           <TodoModal

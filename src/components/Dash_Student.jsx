@@ -178,6 +178,20 @@ function Dash_Student() {
   const [userName, setUserName] = useState(""); // User name state
   const [todos, setTodos] = useState([]); // Todo list state
 
+  const handleDropCourse = async () => {
+    const isConfirmed = window.confirm("정말로 이 수업을 드랍하시겠습니까?");
+
+    if (isConfirmed) {
+      try {
+        await api.delete(`/course/${courseId}/drop`);
+        navigate("/main");
+      } catch (error) {
+        console.error("Failed to drop course:", error);
+        alert("수업 드랍에 실패했습니다.");
+      }
+    }
+  };
+
   const terminalRef = useRef(null);
 
   useEffect(() => {
@@ -297,8 +311,8 @@ function Dash_Student() {
           </TodoListContainer>
         </BoardContent>
         <Buttons>
-          <QuitBtn onClick={() => navigate("/main")}>실습 종료</QuitBtn>
-          <ExitBtn onClick={() => navigate("/main")}>수업 나가기</ExitBtn>
+          <QuitBtn onClick={() => navigate("/main")}>실습 종료하기</QuitBtn>
+          <ExitBtn onClick={handleDropCourse}>수업 드랍하기</ExitBtn>
         </Buttons>
       </WhiteBoard>
     </Container>

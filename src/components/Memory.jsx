@@ -1,9 +1,8 @@
 import PodGraph from "./PodGraph";
 
-export default function Memory({ namespaces }) {
+export default function Memory({ }) {
     return (
         <PodGraph
-            namespaces={namespaces}
             datatype="cpu"
         />
     );
