@@ -47,6 +47,7 @@ export const handleSignUp = async (userData) => {
 
 // src/services/authService.js
 export const handleLogin = async (userData) => {
+  const API_URL = process.env.REACT_APP_API_URL;
   try {
     // 서버가 기대하는 데이터 형식으로 변환
     const formattedData = {
